@@ -2,6 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
 import { Tabs } from 'expo-router/tabs';
 import { Platform, StyleSheet } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '../../ui/theme';
 
 type IconName = keyof typeof Ionicons.glyphMap;
@@ -17,6 +18,9 @@ const TABS: { name: string; title: string; icon: IconName }[] = [
 export default function TabsLayout() {
   const t = useTheme();
   const ios = Platform.OS === 'ios';
+  const insets = useSafeAreaInsets();
+  // keep the bar above the phone's own navigation buttons / gesture area
+  const bottom = Math.max(insets.bottom, 8);
   return (
     <Tabs
       screenOptions={{
@@ -24,8 +28,12 @@ export default function TabsLayout() {
         tabBarActiveTintColor: t.tint,
         tabBarInactiveTintColor: t.dark ? '#8E8E93' : '#999999',
         tabBarLabelStyle: { fontSize: 10, fontWeight: '600' },
+        tabBarItemStyle: { paddingTop: 4 },
         tabBarStyle: {
-          position: 'absolute',
+          // iOS floats a blurred bar over the content; Android gets a solid bar in the layout
+          position: ios ? 'absolute' : 'relative',
+          height: 56 + bottom,
+          paddingBottom: bottom,
           borderTopColor: t.sep,
           borderTopWidth: StyleSheet.hairlineWidth,
           backgroundColor: ios ? 'transparent' : t.tabBar,

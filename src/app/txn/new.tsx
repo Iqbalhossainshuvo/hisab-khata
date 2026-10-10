@@ -152,7 +152,7 @@ export default function NewTxn() {
   const meta = TXN_META[type];
 
   return (
-    <Sheet title={editing ? 'হিসাব সম্পাদনা' : meta.label} onSave={save} canSave={!problem}>
+    <Sheet title={editing ? 'হিসাব সম্পাদনা' : meta.label} onSave={save}>
       {/* type chips */}
       {!editing ? (
         <ScrollView

@@ -146,7 +146,10 @@ export function Page({
   return (
     <ScrollView
       style={{ flex: 1, backgroundColor: t.bg }}
-      contentContainerStyle={{ paddingTop: top, paddingBottom: padBottom + insets.bottom }}
+      contentContainerStyle={{
+        paddingTop: top,
+        paddingBottom: Platform.OS === 'ios' ? padBottom + insets.bottom : Math.min(padBottom, 40),
+      }}
       keyboardShouldPersistTaps="handled"
       showsVerticalScrollIndicator={false}
     >
@@ -608,7 +611,12 @@ export function Fab({ onPress, icon = 'add' }: { onPress: () => void; icon?: Ico
       }}
       style={({ pressed }) => [
         styles.fab,
-        { backgroundColor: t.tint, right, bottom: insets.bottom + 72, transform: [{ scale: pressed ? 0.94 : 1 }] },
+        {
+          backgroundColor: t.tint,
+          right,
+          bottom: Platform.OS === 'ios' ? insets.bottom + 72 : 20,
+          transform: [{ scale: pressed ? 0.94 : 1 }],
+        },
       ]}
     >
       <Ionicons name={icon} size={30} color="#fff" />
@@ -619,7 +627,7 @@ export function Fab({ onPress, icon = 'add' }: { onPress: () => void; icon?: Ico
 export const styles = StyleSheet.create({
   header: { flexDirection: 'row', alignItems: 'flex-end', paddingHorizontal: 20, paddingBottom: 14, paddingTop: 4 },
   headerRight: { flexDirection: 'row', alignItems: 'center', gap: 10, marginLeft: 12, paddingBottom: 4 },
-  iconBtn: { width: 38, height: 38, borderRadius: 19, alignItems: 'center', justifyContent: 'center' },
+  iconBtn: { width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center' },
   card: { borderRadius: 18, marginHorizontal: 16 },
   sectionHead: { flexDirection: 'row', alignItems: 'center', marginHorizontal: 20, marginBottom: 8 },
   group: { borderRadius: 14, marginHorizontal: 16, overflow: 'hidden' },

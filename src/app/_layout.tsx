@@ -2,7 +2,6 @@ import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import * as SystemUI from 'expo-system-ui';
 import { useEffect } from 'react';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { StoreProvider, useStore } from '../data/store';
 import { useTheme } from '../ui/theme';
 
@@ -44,10 +43,8 @@ function Root() {
 
 export default function Layout() {
   return (
-    <SafeAreaProvider>
-      <StoreProvider>
-        <Root />
-      </StoreProvider>
-    </SafeAreaProvider>
+    <StoreProvider>
+      <Root />
+    </StoreProvider>
   );
 }

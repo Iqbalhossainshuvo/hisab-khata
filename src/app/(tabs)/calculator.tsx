@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { Platform, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { evalMinor, evaluate, fracToString, isExpression } from '../../core/calc';
 import { homeToLocal, localToHome, minorToInput, parseRate, rateToString } from '../../core/money';
@@ -63,7 +63,7 @@ function Calc() {
   const [error, setError] = useState('');
   // keys fit both the width and the height (header, display and tab bar need room)
   const byWidth = (w - 32 - 36) / 4;
-  const byHeight = (height - insets.top - insets.bottom - 200 - 120 - 48) / 5;
+  const byHeight = (height - insets.top - insets.bottom - 200 - 120 - 48 - (Platform.OS === 'ios' ? 0 : 20)) / 5;
   const size = Math.max(46, Math.min(88, byWidth, byHeight));
   const gap = size < 60 ? 8 : 12;
   const live = preview(expr);
@@ -126,7 +126,7 @@ function Calc() {
           </T>
         </View>
       </ScrollView>
-      <View style={{ paddingHorizontal: 16, paddingBottom: insets.bottom + 72, gap }}>
+      <View style={{ paddingHorizontal: 16, paddingBottom: Platform.OS === 'ios' ? insets.bottom + 72 : 16, gap }}>
         {KEYS.map((row, ri) => (
           <View key={ri} style={{ flexDirection: 'row', justifyContent: 'space-evenly' }}>
             {row.map((k) => {
