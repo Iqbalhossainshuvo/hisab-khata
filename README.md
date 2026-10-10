@@ -9,6 +9,13 @@
   রেট দিয়ে রূপান্তর আর ভাগ BigInt দিয়ে করা হয়, আর রাউন্ডিং একই নিয়মে হয়। এগুলোর জন্য টেস্ট আছে (`npm test`)।
 - iPhone-এর মতো পরিষ্কার ডিজাইন, লাইট/ডার্ক মোড আর বাংলা সংখ্যার অপশন আছে।
 
+## ডাউনলোড (Android)
+
+সবসময় সর্বশেষ APK: **<https://github.com/Iqbalhossainshuvo/hisab-khata/releases/latest/download/HisabKhata-Android.apk>**
+
+সব ভার্সন দেখতে চাইলে [Releases](https://github.com/Iqbalhossainshuvo/hisab-khata/releases) পেজে যান।
+প্রতিবার main-এ নতুন কোড এলে নতুন ভার্সন নিজে থেকে তৈরি হয়। আগের ভার্সনের উপরে ইনস্টল করলে হিসাব মুছবে না।
+
 ## কী কী আছে
 
 | স্ক্রিন | কাজ |
@@ -51,7 +58,7 @@ Google লগইন চালু করতে Google Cloud-এ একটি ফ�
      SHA-1 পাবেন GitHub Actions-এর “Build Android APK” কাজের লগে, “Signing certificate” ধাপে।
    - **Web application**: একটা বানান এবং এর Client ID কপি করুন।
 5. GitHub repo → **Settings → Secrets and variables → Actions**-এ `GOOGLE_WEB_CLIENT_ID` নামে Web Client ID রাখুন।
-6. Actions থেকে আবার বিল্ড চালান, তারপর **HisabKhata-android** artifact থেকে APK নামিয়ে ফোনে ইনস্টল করুন।
+6. Actions থেকে আবার বিল্ড চালান, তারপর উপরের ডাউনলোড লিংক থেকে নতুন APK নামিয়ে ফোনে ইনস্টল করুন।
 
 > সেটআপ শেষ হওয়ার আগে লগইন স্ক্রিনের **“Google ছাড়া চালু করুন”** দিয়ে অ্যাপ ব্যবহার করা যায়।
 > পরে প্রোফাইল থেকে Google যুক্ত করলে ফোনের সব হিসাব Google-এ উঠে যাবে।

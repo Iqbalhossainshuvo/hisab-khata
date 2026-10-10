@@ -6,7 +6,12 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
+
+# a newer push replaces a build that is still running
+concurrency:
+  group: apk-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   apk:
@@ -56,3 +61,18 @@ jobs:
         with:
           name: HisabKhata-android
           path: HisabKhata-Android.apk
+
+      - name: Publish as a GitHub Release
+        if: github.ref == 'refs/heads/main'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v1.0.${{ github.run_number }}
+          name: হিসাব খাতা 1.0.${{ github.run_number }}
+          target_commitish: ${{ github.sha }}
+          make_latest: true
+          body: |
+            Android অ্যাপ: নিচের **HisabKhata-Android.apk** নামিয়ে ইনস্টল করুন।
+            আগের ভার্সনের উপরে ইনস্টল করলে হিসাব মুছবে না।
+
+            সবসময় সর্বশেষ ভার্সন: https://github.com/${{ github.repository }}/releases/latest/download/HisabKhata-Android.apk
+          files: HisabKhata-Android.apk
