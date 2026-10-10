@@ -1,10 +1,11 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, useWindowDimensions, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { evalMinor, evaluate, fracToString, isExpression } from '../../core/calc';
 import { homeToLocal, localToHome, minorToInput, parseRate, rateToString } from '../../core/money';
 import { useStore } from '../../data/store';
-import { AmountField, Card, Field, Page, Segmented, T, tap } from '../../ui/kit';
+import { AmountField, Card, Field, Page, Segmented, T, tap, useLayout } from '../../ui/kit';
 import { useMoney, useTheme } from '../../ui/theme';
 
 type Mode = 'calc' | 'rate';
@@ -55,11 +56,16 @@ function group(s: string): string {
 
 function Calc() {
   const t = useTheme();
-  const { width } = useWindowDimensions();
+  const { w, height } = useLayout();
+  const insets = useSafeAreaInsets();
   const [expr, setExpr] = useState('');
   const [history, setHistory] = useState<{ expr: string; result: string }[]>([]);
   const [error, setError] = useState('');
-  const size = Math.min(84, (width - 32 - 36) / 4);
+  // keys fit both the width and the height (header, display and tab bar need room)
+  const byWidth = (w - 32 - 36) / 4;
+  const byHeight = (height - insets.top - insets.bottom - 200 - 120 - 48) / 5;
+  const size = Math.max(46, Math.min(88, byWidth, byHeight));
+  const gap = size < 60 ? 8 : 12;
   const live = preview(expr);
 
   const press = (k: string) => {
@@ -94,7 +100,10 @@ function Calc() {
 
   return (
     <View style={{ flex: 1 }}>
-      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ justifyContent: 'flex-end', flexGrow: 1, paddingHorizontal: 20 }}>
+      <ScrollView
+        style={{ flex: 1 }}
+        contentContainerStyle={{ justifyContent: 'flex-end', flexGrow: 1, paddingHorizontal: 20 }}
+      >
         {history
           .slice()
           .reverse()
@@ -117,9 +126,9 @@ function Calc() {
           </T>
         </View>
       </ScrollView>
-      <View style={{ paddingHorizontal: 16, paddingBottom: 100, gap: 12 }}>
+      <View style={{ paddingHorizontal: 16, paddingBottom: insets.bottom + 72, gap }}>
         {KEYS.map((row, ri) => (
-          <View key={ri} style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+          <View key={ri} style={{ flexDirection: 'row', justifyContent: 'space-evenly' }}>
             {row.map((k) => {
               const op = OPS.includes(k);
               const fn = ri === 0 && !op;
@@ -131,13 +140,19 @@ function Calc() {
                   onPress={() => press(k)}
                   style={({ pressed }) => [
                     styles.key,
-                    { width: size, height: size, borderRadius: size / 2, backgroundColor: bg, opacity: pressed ? 0.6 : 1 },
+                    {
+                      width: size,
+                      height: size,
+                      borderRadius: size / 2,
+                      backgroundColor: bg,
+                      opacity: pressed ? 0.6 : 1,
+                    },
                   ]}
                 >
                   {k === '⌫' ? (
-                    <Ionicons name="backspace-outline" size={26} color={fg} />
+                    <Ionicons name="backspace-outline" size={size * 0.32} color={fg} />
                   ) : (
-                    <T size={k === '(' ? 24 : 30} weight={op ? '500' : '400'} color={fg}>
+                    <T size={k === '(' ? size * 0.27 : size * 0.36} weight={op ? '500' : '400'} color={fg}>
                       {k === '(' ? '( )' : k}
                     </T>
                   )}

@@ -76,7 +76,9 @@ export function parseRate(input: string): number | null {
 
 export function rateToString(rateE4: number): string {
   const whole = Math.floor(rateE4 / RATE_SCALE);
-  const frac = String(rateE4 % RATE_SCALE).padStart(4, '0').replace(/0+$/, '');
+  const frac = String(rateE4 % RATE_SCALE)
+    .padStart(4, '0')
+    .replace(/0+$/, '');
   return frac ? `${whole}.${frac}` : String(whole);
 }
 

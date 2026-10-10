@@ -51,7 +51,7 @@ export default function TxnDetail() {
     <Sheet title={meta.label}>
       <View style={{ alignItems: 'center', paddingVertical: 18 }}>
         <IconBadge name={meta.icon} color={meta.color(t)} size={64} />
-        <T size={34} weight="800" style={{ marginTop: 14, fontVariant: ['tabular-nums'] }}>
+        <T size={34} weight="800" fit style={{ marginTop: 14, marginHorizontal: 16, fontVariant: ['tabular-nums'] }}>
           {main}
         </T>
         <T size={15} dim={1} style={{ marginTop: 4 }}>
@@ -60,11 +60,27 @@ export default function TxnDetail() {
       </View>
 
       <Section title="বিস্তারিত">
-        {party ? <Row title={KIND_META[party.kind].label} value={party.name} onPress={() => router.push({ pathname: '/party/[id]', params: { id: party.id } })} /> : null}
-        {agent ? <Row title="দেশের এজেন্ট" value={agent.name} onPress={() => router.push({ pathname: '/party/[id]', params: { id: agent.id } })} /> : null}
+        {party ? (
+          <Row
+            title={KIND_META[party.kind].label}
+            value={party.name}
+            onPress={() => router.push({ pathname: '/party/[id]', params: { id: party.id } })}
+          />
+        ) : null}
+        {agent ? (
+          <Row
+            title="দেশের এজেন্ট"
+            value={agent.name}
+            onPress={() => router.push({ pathname: '/party/[id]', params: { id: agent.id } })}
+          />
+        ) : null}
         {x.type === 'send' ? <Row title="টাকা" value={m.local(x.amount)} /> : null}
         {x.homeAmount !== undefined && x.type !== 'opening' && m.homeCurrency !== m.localCurrency ? (
-          <Row title={x.type === 'send' ? 'দেশে পাঠানো' : 'এজেন্টের খাতায়'} value={m.home(x.homeAmount)} valueColor={t.tint} />
+          <Row
+            title={x.type === 'send' ? 'দেশে পাঠানো' : 'এজেন্টের খাতায়'}
+            value={m.home(x.homeAmount)}
+            valueColor={t.tint}
+          />
         ) : null}
         {x.rateE4 && m.homeCurrency !== m.localCurrency ? <Row title="রেট" value={rateToString(x.rateE4)} /> : null}
         {x.fee ? <Row title="সার্ভিস চার্জ" value={m.local(x.fee)} /> : null}
@@ -77,7 +93,9 @@ export default function TxnDetail() {
       </Section>
 
       <Section title="হিসাবে যা বদলেছে">
-        {e.cash ? <Row title="হাতে ক্যাশ" value={m.local(e.cash, { sign: true })} valueColor={e.cash > 0 ? t.green : t.red} /> : null}
+        {e.cash ? (
+          <Row title="হাতে ক্যাশ" value={m.local(e.cash, { sign: true })} valueColor={e.cash > 0 ? t.green : t.red} />
+        ) : null}
         {e.parties.map((p) => (
           <Row
             key={p.id}
@@ -92,7 +110,11 @@ export default function TxnDetail() {
       </Section>
 
       <View style={{ marginHorizontal: 16, gap: 12 }}>
-        <Button title="সম্পাদনা" icon="create-outline" onPress={() => router.replace({ pathname: '/txn/new', params: { id: x.id } })} />
+        <Button
+          title="সম্পাদনা"
+          icon="create-outline"
+          onPress={() => router.replace({ pathname: '/txn/new', params: { id: x.id } })}
+        />
         <Button title="মুছে ফেলুন" icon="trash-outline" kind="tinted" color={t.red} onPress={remove} />
       </View>
     </Sheet>

@@ -19,7 +19,8 @@ module.exports = {
     userInterfaceStyle: 'automatic',
     backgroundColor: '#F2F2F7',
     ios: {
-      supportsTablet: false,
+      supportsTablet: true,
+      requireFullScreen: true,
       bundleIdentifier: 'com.iqbalhossain.hisabkhata',
       buildNumber: '1',
     },

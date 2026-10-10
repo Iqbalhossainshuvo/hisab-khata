@@ -9,6 +9,7 @@ import {
   StyleSheet,
   Text,
   TextInput,
+  useWindowDimensions,
   View,
   type StyleProp,
   type TextInputProps,
@@ -25,6 +26,25 @@ import { useTheme } from './theme';
 
 type IconName = keyof typeof Ionicons.glyphMap;
 
+/** Content never gets wider than this, so tablets show a centred column. */
+export const MAX_W = 640;
+
+/**
+ * Screen-size helper. `s` scales big text and icons between a 320px phone
+ * (×0.82) and a large phone (×1.12), the reference being a 390px iPhone.
+ */
+export function useLayout() {
+  const { width, height } = useWindowDimensions();
+  const w = Math.min(width, MAX_W);
+  const s = Math.max(0.82, Math.min(1.12, w / 390));
+  return { width, height, w, s, compact: width < 360, short: height < 700, tablet: width >= 600 };
+}
+
+/** Centres content and caps its width on tablets. */
+export function Column({ children, style }: { children: React.ReactNode; style?: StyleProp<ViewStyle> }) {
+  return <View style={[{ width: '100%', maxWidth: MAX_W, alignSelf: 'center' }, style]}>{children}</View>;
+}
+
 export const tap = () => {
   if (Platform.OS !== 'web') void Haptics.selectionAsync().catch(() => {});
 };
@@ -38,7 +58,10 @@ export function T({
   numberOfLines,
   children,
   center,
+  fit,
 }: {
+  /** shrink the text to stay on one line (for big amounts) */
+  fit?: boolean;
   style?: StyleProp<TextStyle>;
   size?: number;
   weight?: TextStyle['fontWeight'];
@@ -49,12 +72,18 @@ export function T({
   children?: React.ReactNode;
 }) {
   const t = useTheme();
+  const { s } = useLayout();
+  // only headings and amounts follow the screen size; body text stays readable
+  const fs = size >= 20 ? Math.round(size * s) : size;
   return (
     <Text
-      numberOfLines={numberOfLines}
+      numberOfLines={fit ? 1 : numberOfLines}
+      adjustsFontSizeToFit={fit}
+      minimumFontScale={fit ? 0.45 : undefined}
+      maxFontSizeMultiplier={1.35}
       style={[
         {
-          fontSize: size,
+          fontSize: fs,
           color: color || (dim === 1 ? t.text2 : dim === 2 ? t.text3 : t.text),
           fontWeight: weight,
           textAlign: center ? 'center' : undefined,
@@ -98,7 +127,7 @@ export function Page({
             {subtitle}
           </T>
         ) : null}
-        <T size={32} weight="800" numberOfLines={1}>
+        <T size={32} weight="800" fit>
           {title}
         </T>
       </View>
@@ -108,8 +137,10 @@ export function Page({
   if (!scroll)
     return (
       <View style={{ flex: 1, backgroundColor: t.bg, paddingTop: top }}>
-        {header}
-        {children}
+        <Column style={{ flex: 1 }}>
+          {header}
+          {children}
+        </Column>
       </View>
     );
   return (
@@ -119,8 +150,10 @@ export function Page({
       keyboardShouldPersistTaps="handled"
       showsVerticalScrollIndicator={false}
     >
-      {header}
-      {children}
+      <Column>
+        {header}
+        {children}
+      </Column>
     </ScrollView>
   );
 }
@@ -169,7 +202,9 @@ export function Avatar({ name, photo, size = 40 }: { name: string; photo?: strin
         justifyContent: 'center',
       }}
     >
-      <Text style={{ color: '#fff', fontWeight: '700', fontSize: size * 0.38 }}>{initials(name)}</Text>
+      <Text allowFontScaling={false} style={{ color: '#fff', fontWeight: '700', fontSize: size * 0.38 }}>
+        {initials(name)}
+      </Text>
     </View>
   );
 }
@@ -191,7 +226,15 @@ export function IconBadge({ name, color, size = 30 }: { name: IconName; color: s
   );
 }
 
-export function Card({ children, style, pad = 16 }: { children: React.ReactNode; style?: StyleProp<ViewStyle>; pad?: number }) {
+export function Card({
+  children,
+  style,
+  pad = 16,
+}: {
+  children: React.ReactNode;
+  style?: StyleProp<ViewStyle>;
+  pad?: number;
+}) {
   const t = useTheme();
   return <View style={[styles.card, { backgroundColor: t.card, padding: pad }, style]}>{children}</View>;
 }
@@ -287,12 +330,12 @@ export function Row({
         ) : null}
       </View>
       {value !== undefined ? (
-        <View style={{ alignItems: 'flex-end', marginLeft: 8, flexShrink: 0 }}>
-          <T size={16} weight="600" color={valueColor} style={{ fontVariant: ['tabular-nums'] }}>
+        <View style={{ alignItems: 'flex-end', marginLeft: 8, maxWidth: '58%' }}>
+          <T size={16} weight="600" color={valueColor} fit style={{ fontVariant: ['tabular-nums'] }}>
             {value}
           </T>
           {valueSub ? (
-            <T size={12} dim={1} style={{ marginTop: 2 }}>
+            <T size={12} dim={1} numberOfLines={1} style={{ marginTop: 2 }}>
               {valueSub}
             </T>
           ) : null}
@@ -347,7 +390,13 @@ export function Button({
       ) : (
         <>
           {icon ? <Ionicons name={icon} size={19} color={fg} style={{ marginRight: 8 }} /> : null}
-          <Text style={{ color: fg, fontSize: 17, fontWeight: '600' }}>{title}</Text>
+          <Text
+            maxFontSizeMultiplier={1.35}
+            numberOfLines={1}
+            style={{ color: fg, fontSize: 17, fontWeight: '600', flexShrink: 1 }}
+          >
+            {title}
+          </Text>
         </>
       )}
     </Pressable>
@@ -405,6 +454,7 @@ export function Field({
       <View style={{ flexDirection: 'row', alignItems: 'center' }}>
         <TextInput
           placeholderTextColor={t.text3}
+          maxFontSizeMultiplier={1.35}
           {...input}
           style={[{ flex: 1, fontSize: 17, color: t.text, paddingVertical: 6 }, input.style]}
         />
@@ -443,6 +493,7 @@ export function AmountField({
   right?: React.ReactNode;
 }) {
   const t = useTheme();
+  const { s: k } = useLayout();
   const [focus, setFocus] = useState(false);
   const v = evalMinor(text);
   const expr = isExpression(text);
@@ -459,11 +510,12 @@ export function AmountField({
           onFocus={() => setFocus(true)}
           onBlur={() => setFocus(false)}
           keyboardType={Platform.OS === 'ios' ? 'numbers-and-punctuation' : 'default'}
+          maxFontSizeMultiplier={1.35}
           placeholder="0"
           placeholderTextColor={t.text3}
           style={{
             flex: 1,
-            fontSize: big ? 30 : 20,
+            fontSize: Math.round((big ? 30 : 20) * k),
             fontWeight: big ? '700' : '600',
             color: t.text,
             paddingVertical: 6,
@@ -511,7 +563,15 @@ export function Empty({ icon, title, text }: { icon: IconName; title: string; te
   );
 }
 
-export function SearchBar({ value, onChange, placeholder }: { value: string; onChange: (s: string) => void; placeholder: string }) {
+export function SearchBar({
+  value,
+  onChange,
+  placeholder,
+}: {
+  value: string;
+  onChange: (s: string) => void;
+  placeholder: string;
+}) {
   const t = useTheme();
   return (
     <View style={[styles.search, { backgroundColor: t.fill }]}>
@@ -521,6 +581,7 @@ export function SearchBar({ value, onChange, placeholder }: { value: string; onC
         onChangeText={onChange}
         placeholder={placeholder}
         placeholderTextColor={t.text2}
+        maxFontSizeMultiplier={1.35}
         style={{ flex: 1, fontSize: 17, color: t.text, marginLeft: 6, paddingVertical: 0 }}
         clearButtonMode="while-editing"
       />
@@ -536,6 +597,9 @@ export function SearchBar({ value, onChange, placeholder }: { value: string; onC
 export function Fab({ onPress, icon = 'add' }: { onPress: () => void; icon?: IconName }) {
   const t = useTheme();
   const insets = useSafeAreaInsets();
+  const { width } = useLayout();
+  // keep the button at the edge of the centred column on tablets
+  const right = Math.max(20, (width - MAX_W) / 2 + 20);
   return (
     <Pressable
       onPress={() => {
@@ -544,7 +608,7 @@ export function Fab({ onPress, icon = 'add' }: { onPress: () => void; icon?: Ico
       }}
       style={({ pressed }) => [
         styles.fab,
-        { backgroundColor: t.tint, bottom: insets.bottom + 72, transform: [{ scale: pressed ? 0.94 : 1 }] },
+        { backgroundColor: t.tint, right, bottom: insets.bottom + 72, transform: [{ scale: pressed ? 0.94 : 1 }] },
       ]}
     >
       <Ionicons name={icon} size={30} color="#fff" />
@@ -590,7 +654,6 @@ export const styles = StyleSheet.create({
   },
   fab: {
     position: 'absolute',
-    right: 20,
     width: 60,
     height: 60,
     borderRadius: 30,

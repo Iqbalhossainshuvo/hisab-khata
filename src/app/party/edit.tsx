@@ -69,7 +69,10 @@ export default function EditParty() {
           <Segmented
             value={kind}
             onChange={setKind}
-            options={(['customer', 'agent', 'partner'] as PartyKind[]).map((k) => ({ value: k, label: KIND_META[k].label }))}
+            options={(['customer', 'agent', 'partner'] as PartyKind[]).map((k) => ({
+              value: k,
+              label: KIND_META[k].label,
+            }))}
           />
         </View>
       ) : null}

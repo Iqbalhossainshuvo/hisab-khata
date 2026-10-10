@@ -6,7 +6,7 @@ import { Pressable, StyleSheet, View } from 'react-native';
 import { balances, daySummary, dayKey, liveParties, liveTxns, totals } from '../../core/ledger';
 import type { TxnType } from '../../core/types';
 import { useStore } from '../../data/store';
-import { Avatar, IconBtn, Page, Row, Section, T, tap } from '../../ui/kit';
+import { Avatar, IconBtn, Page, Row, Section, T, tap, useLayout } from '../../ui/kit';
 import { balanceWord, TXN_META } from '../../ui/meta';
 import { TxnRow } from '../../ui/parts';
 import { dateLabel, useMoney, useTheme } from '../../ui/theme';
@@ -17,6 +17,7 @@ export default function Home() {
   const t = useTheme();
   const m = useMoney();
   const { db, session, prefs, setPrefs, sync } = useStore();
+  const { s: k } = useLayout();
   const today = dayKey();
   const data = useMemo(() => {
     const b = balances(db);
@@ -33,7 +34,13 @@ export default function Home() {
   const dark = prefs.theme === 'dark' || (prefs.theme === 'system' && t.dark);
   const name = session?.user?.name || 'আমি';
   const syncIcon =
-    sync.status === 'syncing' ? 'sync' : sync.status === 'error' ? 'cloud-offline' : sync.status === 'off' ? 'phone-portrait' : 'cloud-done';
+    sync.status === 'syncing'
+      ? 'sync'
+      : sync.status === 'error'
+        ? 'cloud-offline'
+        : sync.status === 'off'
+          ? 'phone-portrait'
+          : 'cloud-done';
   const syncText =
     sync.status === 'syncing'
       ? 'সিঙ্ক হচ্ছে…'
@@ -79,7 +86,7 @@ export default function Home() {
             </T>
           </Pressable>
         </View>
-        <T size={38} weight="800" color="#fff" style={{ marginTop: 6, fontVariant: ['tabular-nums'] }} numberOfLines={1}>
+        <T size={38} weight="800" color="#fff" style={{ marginTop: 6, fontVariant: ['tabular-nums'] }} fit>
           {m.fmt(tot.net)}
           <T size={18} weight="600" color="#ffffffcc">
             {' '}
@@ -112,10 +119,15 @@ export default function Home() {
               }}
               style={({ pressed }) => [styles.quickItem, { opacity: pressed ? 0.6 : 1 }]}
             >
-              <View style={[styles.quickIcon, { backgroundColor: c + (t.dark ? '33' : '1F') }]}>
-                <Ionicons name={meta.icon} size={24} color={c} />
+              <View
+                style={[
+                  styles.quickIcon,
+                  { width: 58 * k, height: 58 * k, borderRadius: 18 * k, backgroundColor: c + (t.dark ? '33' : '1F') },
+                ]}
+              >
+                <Ionicons name={meta.icon} size={24 * k} color={c} />
               </View>
-              <T size={12} weight="600" center style={{ marginTop: 6 }}>
+              <T size={12} weight="600" center numberOfLines={1} style={{ marginTop: 6 }}>
                 {type === 'send' ? 'পাঠান' : type === 'receive' ? 'পেলাম' : type === 'give' ? 'দিলাম' : 'খরচ'}
               </T>
             </Pressable>
@@ -124,10 +136,7 @@ export default function Home() {
       </View>
 
       {/* today */}
-      <Section
-        title="আজকের হিসাব"
-        action={{ label: 'বিস্তারিত', onPress: () => router.push('/report') }}
-      >
+      <Section title="আজকের হিসাব" action={{ label: 'বিস্তারিত', onPress: () => router.push('/report') }}>
         <View style={styles.grid}>
           <Stat label="আগের জের (ক্যাশ)" value={m.fmt(day.openingCash)} />
           <Stat label="এখন ক্যাশ" value={m.fmt(day.closingCash)} color={t.tint} />
@@ -164,19 +173,25 @@ export default function Home() {
         action={data.owesMe.length > 5 ? { label: 'সব', onPress: () => router.push('/parties') } : undefined}
       >
         {data.owesMe.length ? (
-          data.owesMe.slice(0, 5).map((p) => (
-            <Row
-              key={p.id}
-              left={<Avatar name={p.name} size={36} />}
-              title={p.name}
-              subtitle={p.phone || 'পাবো'}
-              value={m.fmt(b.party[p.id])}
-              valueColor={t.green}
-              onPress={() => router.push({ pathname: '/party/[id]', params: { id: p.id } })}
-            />
-          ))
+          data.owesMe
+            .slice(0, 5)
+            .map((p) => (
+              <Row
+                key={p.id}
+                left={<Avatar name={p.name} size={36} />}
+                title={p.name}
+                subtitle={p.phone || 'পাবো'}
+                value={m.fmt(b.party[p.id])}
+                valueColor={t.green}
+                onPress={() => router.push({ pathname: '/party/[id]', params: { id: p.id } })}
+              />
+            ))
         ) : (
-          <Row title="কারো কাছে বাকি নেই" subtitle="সব হিসাব পরিষ্কার" icon={<Ionicons name="checkmark-circle" size={28} color={t.green} />} />
+          <Row
+            title="কারো কাছে বাকি নেই"
+            subtitle="সব হিসাব পরিষ্কার"
+            icon={<Ionicons name="checkmark-circle" size={28} color={t.green} />}
+          />
         )}
       </Section>
 
@@ -202,7 +217,12 @@ export default function Home() {
       >
         {data.recent.length ? (
           data.recent.map((x) => (
-            <TxnRow key={x.id} txn={x} showDate={x.date !== today} onPress={() => router.push({ pathname: '/txn/[id]', params: { id: x.id } })} />
+            <TxnRow
+              key={x.id}
+              txn={x}
+              showDate={x.date !== today}
+              onPress={() => router.push({ pathname: '/txn/[id]', params: { id: x.id } })}
+            />
           ))
         ) : (
           <Row
@@ -223,7 +243,7 @@ function HeroStat({ label, value }: { label: string; value: string }) {
       <T size={12} color="#ffffffbb" weight="500">
         {label}
       </T>
-      <T size={16} color="#fff" weight="700" numberOfLines={1} style={{ marginTop: 3, fontVariant: ['tabular-nums'] }}>
+      <T size={16} color="#fff" weight="700" fit style={{ marginTop: 3, fontVariant: ['tabular-nums'] }}>
         {value}
       </T>
     </View>
@@ -231,12 +251,13 @@ function HeroStat({ label, value }: { label: string; value: string }) {
 }
 
 function Stat({ label, value, color }: { label: string; value: string; color?: string }) {
+  const { tablet } = useLayout();
   return (
-    <View style={styles.stat}>
+    <View style={[styles.stat, { width: tablet ? '25%' : '50%' }]}>
       <T size={12} dim={1} weight="500" numberOfLines={1}>
         {label}
       </T>
-      <T size={17} weight="700" color={color} numberOfLines={1} style={{ marginTop: 4, fontVariant: ['tabular-nums'] }}>
+      <T size={17} weight="700" color={color} fit style={{ marginTop: 4, fontVariant: ['tabular-nums'] }}>
         {value}
       </T>
     </View>
@@ -270,10 +291,9 @@ const styles = StyleSheet.create({
     borderTopColor: '#ffffff55',
   },
   heroDiv: { width: StyleSheet.hairlineWidth, backgroundColor: '#ffffff55', marginHorizontal: 10 },
-  quick: { flexDirection: 'row', justifyContent: 'space-around', marginHorizontal: 16, marginVertical: 22 },
-  quickItem: { alignItems: 'center', width: 76 },
-  quickIcon: { width: 58, height: 58, borderRadius: 18, alignItems: 'center', justifyContent: 'center' },
+  quick: { flexDirection: 'row', marginHorizontal: 12, marginVertical: 22 },
+  quickItem: { alignItems: 'center', flex: 1, paddingHorizontal: 2 },
+  quickIcon: { alignItems: 'center', justifyContent: 'center' },
   grid: { flexDirection: 'row', flexWrap: 'wrap', paddingVertical: 4 },
-  stat: { width: '50%', paddingHorizontal: 16, paddingVertical: 10 },
+  stat: { paddingHorizontal: 16, paddingVertical: 10 },
 });
-

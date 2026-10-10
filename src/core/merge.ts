@@ -45,7 +45,11 @@ export function sanitizeDb(raw: unknown): Db {
 export function fingerprint(db: Db): string {
   return JSON.stringify(db, (_k, v) =>
     v && typeof v === 'object' && !Array.isArray(v)
-      ? Object.fromEntries(Object.keys(v).sort().map((k) => [k, v[k]]))
+      ? Object.fromEntries(
+          Object.keys(v)
+            .sort()
+            .map((k) => [k, v[k]]),
+        )
       : v,
   );
 }

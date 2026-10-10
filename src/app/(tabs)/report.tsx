@@ -37,7 +37,13 @@ export default function Report() {
   return (
     <Page
       title="রিপোর্ট"
-      right={<IconBtn name="share-outline" label="শেয়ার" onPress={() => void Share.share({ message: reportText(db, s, label) })} />}
+      right={
+        <IconBtn
+          name="share-outline"
+          label="শেয়ার"
+          onPress={() => void Share.share({ message: reportText(db, s, label) })}
+        />
+      }
     >
       <Segmented
         style={{ marginHorizontal: 16, marginBottom: 14 }}
@@ -129,7 +135,13 @@ function Line({ label, value, color, bold }: { label: string; value: string; col
       <T size={bold ? 17 : 16} weight={bold ? '700' : '400'} style={{ flex: 1 }}>
         {label}
       </T>
-      <T size={bold ? 20 : 16} weight={bold ? '800' : '600'} color={color} style={{ fontVariant: ['tabular-nums'] }}>
+      <T
+        size={bold ? 20 : 16}
+        weight={bold ? '800' : '600'}
+        color={color}
+        fit
+        style={{ fontVariant: ['tabular-nums'], maxWidth: '62%' }}
+      >
         {value}
       </T>
     </View>

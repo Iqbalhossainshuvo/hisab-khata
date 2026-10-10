@@ -98,11 +98,7 @@ export default function NewTxn() {
   }, [needsParty, party, type, twoCur, rateE4, isAgentParty, same, homeV, local, paidMode, paid]);
 
   const pickerKinds: PartyKind[] =
-    picker === 'agent'
-      ? ['agent']
-      : type === 'send'
-        ? ['customer', 'partner']
-        : ['customer', 'partner', 'agent'];
+    picker === 'agent' ? ['agent'] : type === 'send' ? ['customer', 'partner'] : ['customer', 'partner', 'agent'];
 
   const save = () => {
     if (problem) {
@@ -159,7 +155,11 @@ export default function NewTxn() {
     <Sheet title={editing ? 'হিসাব সম্পাদনা' : meta.label} onSave={save} canSave={!problem}>
       {/* type chips */}
       {!editing ? (
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 16, gap: 8, paddingBottom: 16 }}>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={{ paddingHorizontal: 16, gap: 8, paddingBottom: 16 }}
+        >
           {TYPES.map((ty) => {
             const on = ty === type;
             const c = TXN_META[ty].color(t);
@@ -186,8 +186,22 @@ export default function NewTxn() {
       {needsParty || type === 'opening' ? (
         <Section>
           <Row
-            left={party ? <Avatar name={party.name} size={36} /> : <Ionicons name="person-circle" size={36} color={t.text3} />}
-            title={party ? party.name : type === 'send' ? 'কাস্টমার বাছাই করুন' : type === 'opening' ? 'কার জের? (খালি = নিজের ক্যাশ)' : 'কার সাথে?'}
+            left={
+              party ? (
+                <Avatar name={party.name} size={36} />
+              ) : (
+                <Ionicons name="person-circle" size={36} color={t.text3} />
+              )
+            }
+            title={
+              party
+                ? party.name
+                : type === 'send'
+                  ? 'কাস্টমার বাছাই করুন'
+                  : type === 'opening'
+                    ? 'কার জের? (খালি = নিজের ক্যাশ)'
+                    : 'কার সাথে?'
+            }
             subtitle={party ? KIND_META[party.kind].label : 'ট্যাপ করুন'}
             onPress={() => setPicker('party')}
             right={
@@ -200,7 +214,9 @@ export default function NewTxn() {
           />
           {type === 'send' ? (
             <Row
-              left={agent ? <Avatar name={agent.name} size={36} /> : <Ionicons name="business" size={30} color={t.text3} />}
+              left={
+                agent ? <Avatar name={agent.name} size={36} /> : <Ionicons name="business" size={30} color={t.text3} />
+              }
               title={agent ? agent.name : 'দেশের এজেন্ট বাছাই করুন'}
               subtitle={agent ? 'দেশে যে টাকা দেবে' : 'ঐচ্ছিক'}
               onPress={() => setPicker('agent')}
@@ -220,13 +236,28 @@ export default function NewTxn() {
           />
         ) : null}
         {twoCur && type === 'send' ? (
-          <AmountField label="দেশে পাঠাবে" currency={m.homeCurrency} text={home} onText={setHomeText} big autoFocus={!editing} />
+          <AmountField
+            label="দেশে পাঠাবে"
+            currency={m.homeCurrency}
+            text={home}
+            onText={setHomeText}
+            big
+            autoFocus={!editing}
+          />
         ) : null}
         {type === 'opening' && isAgentParty && !same ? (
           <AmountField label="আগের জের" currency={m.homeCurrency} text={home} onText={setHomeText} big />
         ) : (
           <AmountField
-            label={type === 'send' ? (twoCur ? 'টাকার পরিমাণ (এখানের)' : 'পাঠানোর পরিমাণ') : type === 'opening' ? 'আগের জের' : 'টাকার পরিমাণ'}
+            label={
+              type === 'send'
+                ? twoCur
+                  ? 'টাকার পরিমাণ (এখানের)'
+                  : 'পাঠানোর পরিমাণ'
+                : type === 'opening'
+                  ? 'আগের জের'
+                  : 'টাকার পরিমাণ'
+            }
             currency={m.localCurrency}
             text={amount}
             onText={setLocalText}
@@ -243,7 +274,13 @@ export default function NewTxn() {
           />
         ) : null}
         {type === 'send' ? (
-          <AmountField label="সার্ভিস চার্জ" currency={m.localCurrency} text={fee} onText={setFee} hint="না থাকলে খালি রাখুন" />
+          <AmountField
+            label="সার্ভিস চার্জ"
+            currency={m.localCurrency}
+            text={fee}
+            onText={setFee}
+            hint="না থাকলে খালি রাখুন"
+          />
         ) : null}
       </Section>
 
@@ -307,7 +344,12 @@ export default function NewTxn() {
       {/* details */}
       <Section>
         {type === 'send' ? (
-          <Field label="প্রাপক (দেশে কে পাবে)" placeholder="নাম / মোবাইল / বিকাশ নম্বর" value={receiver} onChangeText={setReceiver} />
+          <Field
+            label="প্রাপক (দেশে কে পাবে)"
+            placeholder="নাম / মোবাইল / বিকাশ নম্বর"
+            value={receiver}
+            onChangeText={setReceiver}
+          />
         ) : null}
         <Field label="নোট" placeholder="ঐচ্ছিক" value={note} onChangeText={setNote} />
         <View style={styles.dateRow}>
@@ -317,7 +359,10 @@ export default function NewTxn() {
           <Pressable onPress={() => setDate(shiftDay(date, -1))} hitSlop={10}>
             <Ionicons name="chevron-back-circle" size={28} color={t.tint} />
           </Pressable>
-          <Pressable onPress={() => setDate(dayKey())} style={{ marginHorizontal: 10, alignItems: 'center', minWidth: 130 }}>
+          <Pressable
+            onPress={() => setDate(dayKey())}
+            style={{ marginHorizontal: 10, alignItems: 'center', minWidth: 130 }}
+          >
             <T size={16} weight="600">
               {dateLabel(date)}
             </T>
@@ -364,7 +409,13 @@ function Line({ label, value, color, bold }: { label: string; value: string; col
       <T size={15} dim={bold ? undefined : 1} weight={bold ? '700' : '400'} style={{ flex: 1 }}>
         {label}
       </T>
-      <T size={bold ? 17 : 15} weight={bold ? '800' : '600'} color={color} style={{ fontVariant: ['tabular-nums'] }}>
+      <T
+        size={bold ? 17 : 15}
+        weight={bold ? '800' : '600'}
+        color={color}
+        fit
+        style={{ fontVariant: ['tabular-nums'], maxWidth: '62%' }}
+      >
         {value}
       </T>
     </View>

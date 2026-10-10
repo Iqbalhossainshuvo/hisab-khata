@@ -1,12 +1,12 @@
 /* App-specific pieces: a transaction row and the party picker sheet. */
 import React, { useMemo, useState } from 'react';
-import { FlatList, Modal, Pressable, View } from 'react-native';
+import { FlatList, Modal, Platform, Pressable, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { balances, liveParties } from '../core/ledger';
 import type { Party, PartyKind, Txn } from '../core/types';
 import { useStore } from '../data/store';
-import { Avatar, IconBadge, Row, SearchBar, Segmented, T, tap } from './kit';
+import { Avatar, Column, IconBadge, Row, SearchBar, Segmented, T, tap } from './kit';
 import { balanceWord, KIND_META, TXN_META } from './meta';
 import { dateLabel, timeLabel, useMoney, useTheme } from './theme';
 
@@ -88,98 +88,100 @@ export function PartyPicker({
 
   return (
     <Modal visible={visible} animationType="slide" presentationStyle="pageSheet" onRequestClose={close}>
-      <View style={{ flex: 1, backgroundColor: t.bg, paddingTop: 12 }}>
-        <View style={{ flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingBottom: 12 }}>
-          <T size={20} weight="700" style={{ flex: 1 }}>
-            {title}
-          </T>
-          <Pressable onPress={close} hitSlop={10}>
-            <T color={t.tint} weight="600">
-              বন্ধ
+      <View style={{ flex: 1, backgroundColor: t.bg, paddingTop: Platform.OS === 'ios' ? 12 : insets.top + 12 }}>
+        <Column style={{ flex: 1 }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingBottom: 12 }}>
+            <T size={20} weight="700" style={{ flex: 1 }}>
+              {title}
             </T>
-          </Pressable>
-        </View>
-        {kinds.length > 1 ? (
-          <Segmented
-            style={{ marginHorizontal: 16, marginBottom: 12 }}
-            value={kind}
-            onChange={setKind}
-            options={kinds.map((k) => ({ value: k, label: KIND_META[k].plural }))}
-          />
-        ) : null}
-        <SearchBar value={q} onChange={setQ} placeholder="নাম বা নম্বর খুঁজুন" />
-        <FlatList
-          data={list}
-          keyExtractor={(p) => p.id}
-          keyboardShouldPersistTaps="handled"
-          contentContainerStyle={{ paddingBottom: insets.bottom + 20 }}
-          ListHeaderComponent={
-            q.trim() && !exact ? (
-              <Pressable
-                onPress={() => {
-                  tap();
-                  const p = saveParty({ kind, name: q.trim() });
-                  setQ('');
-                  setKind(null);
-                  onPick(p);
-                }}
-                style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  marginHorizontal: 16,
-                  marginBottom: 12,
-                  padding: 14,
-                  borderRadius: 14,
-                  backgroundColor: t.tint + '1A',
-                }}
-              >
-                <Ionicons name="person-add" size={20} color={t.tint} />
-                <T color={t.tint} weight="600" style={{ marginLeft: 10, flex: 1 }} numberOfLines={1}>
-                  নতুন {KIND_META[kind].label}: “{q.trim()}”
-                </T>
-              </Pressable>
-            ) : null
-          }
-          renderItem={({ item, index }) => {
-            const v = bal[item.id] || 0;
-            const cur = item.kind === 'agent' ? m.homeCurrency : m.localCurrency;
-            return (
-              <View
-                style={{
-                  backgroundColor: t.card,
-                  marginHorizontal: 16,
-                  borderTopLeftRadius: index === 0 ? 14 : 0,
-                  borderTopRightRadius: index === 0 ? 14 : 0,
-                  borderBottomLeftRadius: index === list.length - 1 ? 14 : 0,
-                  borderBottomRightRadius: index === list.length - 1 ? 14 : 0,
-                  overflow: 'hidden',
-                }}
-              >
-                <Row
-                  left={<Avatar name={item.name} size={36} />}
-                  title={item.name}
-                  subtitle={item.phone || balanceWord(v, item.kind)}
-                  value={v ? m.fmt(v, { abs: true, cur }) : undefined}
-                  valueColor={v > 0 ? t.green : v < 0 ? t.red : undefined}
+            <Pressable onPress={close} hitSlop={10}>
+              <T color={t.tint} weight="600">
+                বন্ধ
+              </T>
+            </Pressable>
+          </View>
+          {kinds.length > 1 ? (
+            <Segmented
+              style={{ marginHorizontal: 16, marginBottom: 12 }}
+              value={kind}
+              onChange={setKind}
+              options={kinds.map((k) => ({ value: k, label: KIND_META[k].plural }))}
+            />
+          ) : null}
+          <SearchBar value={q} onChange={setQ} placeholder="নাম বা নম্বর খুঁজুন" />
+          <FlatList
+            data={list}
+            keyExtractor={(p) => p.id}
+            keyboardShouldPersistTaps="handled"
+            contentContainerStyle={{ paddingBottom: insets.bottom + 20 }}
+            ListHeaderComponent={
+              q.trim() && !exact ? (
+                <Pressable
                   onPress={() => {
                     tap();
+                    const p = saveParty({ kind, name: q.trim() });
                     setQ('');
                     setKind(null);
-                    onPick(item);
+                    onPick(p);
                   }}
-                  chevron={false}
-                />
-              </View>
-            );
-          }}
-          ListEmptyComponent={
-            !q.trim() ? (
-              <T dim={1} center style={{ marginTop: 30, marginHorizontal: 30 }}>
-                এখনো কোনো {KIND_META[kind].label} নেই। উপরে নাম লিখে যোগ করুন।
-              </T>
-            ) : null
-          }
-        />
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    marginHorizontal: 16,
+                    marginBottom: 12,
+                    padding: 14,
+                    borderRadius: 14,
+                    backgroundColor: t.tint + '1A',
+                  }}
+                >
+                  <Ionicons name="person-add" size={20} color={t.tint} />
+                  <T color={t.tint} weight="600" style={{ marginLeft: 10, flex: 1 }} numberOfLines={1}>
+                    নতুন {KIND_META[kind].label}: “{q.trim()}”
+                  </T>
+                </Pressable>
+              ) : null
+            }
+            renderItem={({ item, index }) => {
+              const v = bal[item.id] || 0;
+              const cur = item.kind === 'agent' ? m.homeCurrency : m.localCurrency;
+              return (
+                <View
+                  style={{
+                    backgroundColor: t.card,
+                    marginHorizontal: 16,
+                    borderTopLeftRadius: index === 0 ? 14 : 0,
+                    borderTopRightRadius: index === 0 ? 14 : 0,
+                    borderBottomLeftRadius: index === list.length - 1 ? 14 : 0,
+                    borderBottomRightRadius: index === list.length - 1 ? 14 : 0,
+                    overflow: 'hidden',
+                  }}
+                >
+                  <Row
+                    left={<Avatar name={item.name} size={36} />}
+                    title={item.name}
+                    subtitle={item.phone || balanceWord(v, item.kind)}
+                    value={v ? m.fmt(v, { abs: true, cur }) : undefined}
+                    valueColor={v > 0 ? t.green : v < 0 ? t.red : undefined}
+                    onPress={() => {
+                      tap();
+                      setQ('');
+                      setKind(null);
+                      onPick(item);
+                    }}
+                    chevron={false}
+                  />
+                </View>
+              );
+            }}
+            ListEmptyComponent={
+              !q.trim() ? (
+                <T dim={1} center style={{ marginTop: 30, marginHorizontal: 30 }}>
+                  এখনো কোনো {KIND_META[kind].label} নেই। উপরে নাম লিখে যোগ করুন।
+                </T>
+              ) : null
+            }
+          />
+        </Column>
       </View>
     </Modal>
   );

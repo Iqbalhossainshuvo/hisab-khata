@@ -24,7 +24,21 @@ const num = (v: number | undefined) => (v === undefined ? '' : formatMinor(v, { 
 export function toCsv(db: Db): string {
   const L = db.settings.localCurrency;
   const H = db.settings.homeCurrency;
-  const head = ['তারিখ', 'ধরন', 'নাম', 'এজেন্ট', `টাকা (${L})`, `দেশে (${H})`, 'রেট', 'চার্জ', 'দিয়েছে', 'বাকি', `ক্যাশ পরিবর্তন (${L})`, 'প্রাপক', 'নোট'];
+  const head = [
+    'তারিখ',
+    'ধরন',
+    'নাম',
+    'এজেন্ট',
+    `টাকা (${L})`,
+    `দেশে (${H})`,
+    'রেট',
+    'চার্জ',
+    'দিয়েছে',
+    'বাকি',
+    `ক্যাশ পরিবর্তন (${L})`,
+    'প্রাপক',
+    'নোট',
+  ];
   const rows = liveTxns(db).map((t) => {
     const e = txnEffects(t);
     const due = t.type === 'send' ? t.amount + (t.fee || 0) - (t.paid || 0) : undefined;
@@ -53,5 +67,9 @@ export async function shareCsv(db: Db) {
   if (f.exists) f.delete();
   f.create();
   f.write(toCsv(db));
-  await Sharing.shareAsync(f.uri, { mimeType: 'text/csv', dialogTitle: 'হিসাব এক্সপোর্ট', UTI: 'public.comma-separated-values-text' });
+  await Sharing.shareAsync(f.uri, {
+    mimeType: 'text/csv',
+    dialogTitle: 'হিসাব এক্সপোর্ট',
+    UTI: 'public.comma-separated-values-text',
+  });
 }

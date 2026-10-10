@@ -41,14 +41,17 @@ export default function Parties() {
         style={{ marginHorizontal: 16, marginBottom: 12 }}
         value={kind}
         onChange={setKind}
-        options={(['customer', 'agent', 'partner'] as PartyKind[]).map((k) => ({ value: k, label: KIND_META[k].plural }))}
+        options={(['customer', 'agent', 'partner'] as PartyKind[]).map((k) => ({
+          value: k,
+          label: KIND_META[k].plural,
+        }))}
       />
       <View style={{ flexDirection: 'row', marginHorizontal: 16, marginBottom: 12, gap: 10 }}>
         <View style={{ flex: 1, backgroundColor: t.card, borderRadius: 14, padding: 12 }}>
           <T size={12} dim={1} weight="500">
             {kind === 'agent' ? 'এজেন্ট দেবে' : 'মোট পাবো (বাকি)'}
           </T>
-          <T size={18} weight="700" color={t.green} style={{ marginTop: 3 }} numberOfLines={1}>
+          <T size={18} weight="700" color={t.green} style={{ marginTop: 3 }} fit>
             {m.fmt(plus, { cur })}
           </T>
         </View>
@@ -56,14 +59,14 @@ export default function Parties() {
           <T size={12} dim={1} weight="500">
             {kind === 'agent' ? 'এজেন্টকে দেবো' : 'মোট দেবো'}
           </T>
-          <T size={18} weight="700" color={t.red} style={{ marginTop: 3 }} numberOfLines={1}>
+          <T size={18} weight="700" color={t.red} style={{ marginTop: 3 }} fit>
             {m.fmt(minus, { cur })}
           </T>
         </View>
       </View>
       <SearchBar value={q} onChange={setQ} placeholder={`${KIND_META[kind].label} খুঁজুন`} />
       <View style={{ flexDirection: 'row', alignItems: 'center', marginHorizontal: 20, marginBottom: 6 }}>
-        <T size={13} dim={1} style={{ flex: 1 }}>
+        <T size={13} dim={1} numberOfLines={1} style={{ flex: 1, marginRight: 8 }}>
           {list.length} জন · {KIND_META[kind].hint}
         </T>
         <Pressable hitSlop={8} onPress={() => setSort(sort === 'due' ? 'name' : 'due')}>

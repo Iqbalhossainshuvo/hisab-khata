@@ -52,7 +52,10 @@ export default function PartyScreen() {
     const cur = isAgent ? db.settings.homeCurrency : db.settings.localCurrency;
     const body = lines
       .slice(-30)
-      .map((l) => `${l.txn.date}  ${TXN_META[l.txn.type].short}  ${formatMinor(l.delta, { sign: true })}  = ${formatMinor(l.balance)}`)
+      .map(
+        (l) =>
+          `${l.txn.date}  ${TXN_META[l.txn.type].short}  ${formatMinor(l.delta, { sign: true })}  = ${formatMinor(l.balance)}`,
+      )
       .join('\n');
     void Share.share({
       message: `${p.name} — হিসাব\n\n${body}\n\nবর্তমান: ${formatMinor(Math.abs(bal))} ${cur} (${balanceWord(bal, p.kind)})`,
@@ -66,7 +69,7 @@ export default function PartyScreen() {
           headerShown: true,
           title: '',
           headerRight: () => (
-            <View style={{ flexDirection: 'row', gap: 18 }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 18, paddingRight: 4 }}>
               <Pressable onPress={share} hitSlop={8}>
                 <Ionicons name="share-outline" size={23} color={t.tint} />
               </Pressable>
@@ -82,7 +85,7 @@ export default function PartyScreen() {
       <Page padBottom={40} topInset={false}>
         <View style={{ alignItems: 'center', marginBottom: 20 }}>
           <Avatar name={p.name} size={84} />
-          <T size={26} weight="700" style={{ marginTop: 12 }}>
+          <T size={26} weight="700" center numberOfLines={2} style={{ marginTop: 12, marginHorizontal: 16 }}>
             {p.name}
           </T>
           <T size={14} dim={1} style={{ marginTop: 2 }}>
@@ -101,7 +104,7 @@ export default function PartyScreen() {
           <T size={13} dim={1} weight="600">
             {balanceWord(bal, p.kind)}
           </T>
-          <T size={36} weight="800" color={color} style={{ marginTop: 4, fontVariant: ['tabular-nums'] }}>
+          <T size={36} weight="800" color={color} fit style={{ marginTop: 4, fontVariant: ['tabular-nums'] }}>
             {fmt(bal, { abs: true })}
           </T>
         </View>
@@ -119,7 +122,7 @@ export default function PartyScreen() {
                 style={({ pressed }) => [styles.action, { backgroundColor: t.card, opacity: pressed ? 0.6 : 1 }]}
               >
                 <Ionicons name={TXN_META[a.type].icon} size={22} color={c} />
-                <T size={12} weight="600" center style={{ marginTop: 6 }}>
+                <T size={12} weight="600" center numberOfLines={2} style={{ marginTop: 6 }}>
                   {a.label}
                 </T>
               </Pressable>
@@ -133,7 +136,10 @@ export default function PartyScreen() {
           </Section>
         ) : null}
 
-        <Section title="হিসাবের বিবরণ" footer={isAgent ? 'মাইনাস = আমি এজেন্টকে দেব' : 'প্লাস = সে আমাকে দেবে, মাইনাস = আমি তাকে দেব'}>
+        <Section
+          title="হিসাবের বিবরণ"
+          footer={isAgent ? 'মাইনাস = আমি এজেন্টকে দেব' : 'প্লাস = সে আমাকে দেবে, মাইনাস = আমি তাকে দেব'}
+        >
           {lines.length ? (
             lines
               .slice()
@@ -165,7 +171,15 @@ export default function PartyScreen() {
   );
 }
 
-function Circle({ icon, color, onPress }: { icon: keyof typeof Ionicons.glyphMap; color: string; onPress: () => void }) {
+function Circle({
+  icon,
+  color,
+  onPress,
+}: {
+  icon: keyof typeof Ionicons.glyphMap;
+  color: string;
+  onPress: () => void;
+}) {
   return (
     <Pressable onPress={onPress} style={[styles.circle, { backgroundColor: color + '22' }]}>
       <Ionicons name={icon} size={20} color={color} />

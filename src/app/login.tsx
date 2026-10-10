@@ -1,10 +1,10 @@
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useState } from 'react';
-import { Alert, Pressable, StyleSheet, View } from 'react-native';
+import { Alert, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useStore } from '../data/store';
-import { T, tap } from '../ui/kit';
+import { Column, T, tap, useLayout } from '../ui/kit';
 import { useTheme } from '../ui/theme';
 
 const FEATURES: { icon: keyof typeof Ionicons.glyphMap; title: string; text: string }[] = [
@@ -18,6 +18,7 @@ export default function Login() {
   const insets = useSafeAreaInsets();
   const { signInWithGoogle, continueAsGuest } = useStore();
   const [busy, setBusy] = useState(false);
+  const { short, s: k } = useLayout();
 
   const google = async () => {
     setBusy(true);
@@ -46,35 +47,46 @@ export default function Login() {
         colors={t.dark ? ['#0A2A66', '#000000'] : ['#D6E6FF', '#F2F2F7']}
         style={StyleSheet.absoluteFill}
       />
-      <View style={{ flex: 1, paddingTop: insets.top + 60, paddingHorizontal: 28 }}>
-        <LinearGradient colors={t.hero} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.logo}>
-          <Ionicons name="wallet" size={46} color="#fff" />
-        </LinearGradient>
-        <T size={36} weight="800" center style={{ marginTop: 22 }}>
-          হিসাব খাতা
-        </T>
-        <T size={16} dim={1} center style={{ marginTop: 6 }}>
-          টাকা পাঠানোর দৈনিক হিসাব — সহজ, নির্ভুল, নিরাপদ
-        </T>
+      <ScrollView
+        style={{ flex: 1 }}
+        contentContainerStyle={{ paddingTop: insets.top + (short ? 24 : 60), paddingHorizontal: 28, paddingBottom: 16 }}
+        showsVerticalScrollIndicator={false}
+      >
+        <Column>
+          <LinearGradient
+            colors={t.hero}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={[styles.logo, { width: 96 * k, height: 96 * k, borderRadius: 24 * k }]}
+          >
+            <Ionicons name="wallet" size={46 * k} color="#fff" />
+          </LinearGradient>
+          <T size={36} weight="800" center style={{ marginTop: 22 }}>
+            হিসাব খাতা
+          </T>
+          <T size={16} dim={1} center style={{ marginTop: 6 }}>
+            টাকা পাঠানোর দৈনিক হিসাব — সহজ, নির্ভুল, নিরাপদ
+          </T>
 
-        <View style={{ marginTop: 42, gap: 22 }}>
-          {FEATURES.map((f) => (
-            <View key={f.title} style={{ flexDirection: 'row', alignItems: 'center' }}>
-              <Ionicons name={f.icon} size={34} color={t.tint} style={{ width: 46 }} />
-              <View style={{ flex: 1 }}>
-                <T size={16} weight="600">
-                  {f.title}
-                </T>
-                <T size={14} dim={1} style={{ marginTop: 2 }}>
-                  {f.text}
-                </T>
+          <View style={{ marginTop: short ? 28 : 42, gap: short ? 16 : 22 }}>
+            {FEATURES.map((f) => (
+              <View key={f.title} style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <Ionicons name={f.icon} size={34} color={t.tint} style={{ width: 46 }} />
+                <View style={{ flex: 1 }}>
+                  <T size={16} weight="600">
+                    {f.title}
+                  </T>
+                  <T size={14} dim={1} style={{ marginTop: 2 }}>
+                    {f.text}
+                  </T>
+                </View>
               </View>
-            </View>
-          ))}
-        </View>
-      </View>
+            ))}
+          </View>
+        </Column>
+      </ScrollView>
 
-      <View style={{ paddingHorizontal: 24, paddingBottom: insets.bottom + 24 }}>
+      <Column style={{ paddingHorizontal: 24, paddingBottom: insets.bottom + (short ? 8 : 24) }}>
         <Pressable
           disabled={busy}
           onPress={() => {
@@ -87,7 +99,13 @@ export default function Login() {
           ]}
         >
           <Ionicons name="logo-google" size={20} color={t.dark ? '#000' : '#fff'} />
-          <T size={17} weight="600" color={t.dark ? '#000' : '#fff'} style={{ marginLeft: 10 }}>
+          <T
+            size={17}
+            weight="600"
+            color={t.dark ? '#000' : '#fff'}
+            numberOfLines={1}
+            style={{ marginLeft: 10, flexShrink: 1 }}
+          >
             {busy ? 'Google থেকে হিসাব আনা হচ্ছে…' : 'Google দিয়ে চালিয়ে যান'}
           </T>
         </Pressable>
@@ -96,16 +114,13 @@ export default function Login() {
             Google ছাড়া চালু করুন
           </T>
         </Pressable>
-      </View>
+      </Column>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   logo: {
-    width: 96,
-    height: 96,
-    borderRadius: 24,
     alignSelf: 'center',
     alignItems: 'center',
     justifyContent: 'center',

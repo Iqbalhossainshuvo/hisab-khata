@@ -64,10 +64,14 @@ export default function Profile() {
       setBusy(false);
       const finish = () => void signOut();
       if (!ok) {
-        Alert.alert('Google-এ সব ওঠেনি', 'এখন বের হলে শেষ কিছু হিসাব হারাতে পারে। ইন্টারনেট চালু করে আবার চেষ্টা করুন।', [
-          { text: 'থাকুন', style: 'cancel' },
-          { text: 'তবুও বের হন', style: 'destructive', onPress: finish },
-        ]);
+        Alert.alert(
+          'Google-এ সব ওঠেনি',
+          'এখন বের হলে শেষ কিছু হিসাব হারাতে পারে। ইন্টারনেট চালু করে আবার চেষ্টা করুন।',
+          [
+            { text: 'থাকুন', style: 'cancel' },
+            { text: 'তবুও বের হন', style: 'destructive', onPress: finish },
+          ],
+        );
       } else finish();
     };
     Alert.alert(
@@ -108,11 +112,23 @@ export default function Profile() {
         </T>
       </View>
 
-      <Section title="Google ব্যাকআপ" footer={google ? 'সব হিসাব আপনার Google Drive-এর গোপন অ্যাপ-ফোল্ডারে থাকে। নতুন ফোনে একই Google দিয়ে ঢুকলে সব ফিরে আসবে।' : undefined}>
+      <Section
+        title="Google ব্যাকআপ"
+        footer={
+          google
+            ? 'সব হিসাব আপনার Google Drive-এর গোপন অ্যাপ-ফোল্ডারে থাকে। নতুন ফোনে একই Google দিয়ে ঢুকলে সব ফিরে আসবে।'
+            : undefined
+        }
+      >
         {google ? (
           <>
             <Row
-              icon={<IconBadge name={sync.status === 'error' ? 'cloud-offline' : 'cloud-done'} color={sync.status === 'error' ? t.red : t.green} />}
+              icon={
+                <IconBadge
+                  name={sync.status === 'error' ? 'cloud-offline' : 'cloud-done'}
+                  color={sync.status === 'error' ? t.red : t.green}
+                />
+              }
               title={sync.status === 'error' ? 'সমস্যা হয়েছে' : 'Google-এ সংরক্ষিত'}
               subtitle={syncLine}
               right={sync.status === 'syncing' ? <ActivityIndicator /> : undefined}
@@ -136,7 +152,13 @@ export default function Profile() {
 
       <Section title="ব্যবসার তথ্য" footer="রেট = ১ এখানের টাকায় দেশের কত টাকা। দুই মুদ্রা একই হলে রেটের দরকার নেই।">
         <Field label="ব্যবসার নাম" placeholder="যেমন: রহিম ট্রাভেলস" value={business} onChangeText={setBusiness} />
-        <Field label="এখানের মুদ্রা" placeholder="SAR / AED / MYR / QAR" value={local} onChangeText={setLocal} autoCapitalize="characters" />
+        <Field
+          label="এখানের মুদ্রা"
+          placeholder="SAR / AED / MYR / QAR"
+          value={local}
+          onChangeText={setLocal}
+          autoCapitalize="characters"
+        />
         <Field label="দেশের মুদ্রা" placeholder="BDT" value={home} onChangeText={setHome} autoCapitalize="characters" />
         <Field label="সাধারণ রেট" placeholder="32.50" value={rate} onChangeText={setRate} keyboardType="decimal-pad" />
       </Section>
@@ -179,7 +201,14 @@ export default function Profile() {
       </Section>
 
       <View style={{ marginHorizontal: 16 }}>
-        <Button title="লগআউট" kind="tinted" color={t.red} icon="log-out-outline" onPress={logout} loading={busy && google} />
+        <Button
+          title="লগআউট"
+          kind="tinted"
+          color={t.red}
+          icon="log-out-outline"
+          onPress={logout}
+          loading={busy && google}
+        />
       </View>
       <View style={{ alignItems: 'center', marginTop: 24 }}>
         <Ionicons name="wallet" size={20} color={t.text3} />
