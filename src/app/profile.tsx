@@ -1,4 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
+import Constants from 'expo-constants';
 import { useState } from 'react';
 import { ActivityIndicator, Alert, Switch, View } from 'react-native';
 import { parseRate, rateToString } from '../core/money';
@@ -213,7 +214,7 @@ export default function Profile() {
       <View style={{ alignItems: 'center', marginTop: 24 }}>
         <Ionicons name="wallet" size={20} color={t.text3} />
         <T size={12} dim={2} style={{ marginTop: 4 }}>
-          হিসাব খাতা · v1.0.0
+          হিসাব খাতা · v{Constants.expoConfig?.version}
         </T>
       </View>
     </Sheet>

@@ -8,6 +8,9 @@ on:
 permissions:
   contents: write
 
+env:
+  APP_BUILD: ${{ github.run_number }}
+
 # a newer push replaces a build that is still running
 concurrency:
   group: apk-${{ github.ref }}

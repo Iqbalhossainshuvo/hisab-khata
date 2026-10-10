@@ -5,6 +5,8 @@
  *   GOOGLE_IOS_CLIENT_ID   – "iOS" client (needed only for iPhone builds)
  */
 const iosClientId = process.env.GOOGLE_IOS_CLIENT_ID || '';
+// CI passes the run number, so every APK is a higher version and installs as an update
+const build = Number(process.env.APP_BUILD || 1);
 // com.googleusercontent.apps.XXXX – the reversed iOS client id
 const iosUrlScheme = iosClientId ? iosClientId.split('.').reverse().join('.') : '';
 
@@ -13,7 +15,7 @@ module.exports = {
     name: 'হিসাব খাতা',
     slug: 'hisab-khata',
     scheme: 'hisabkhata',
-    version: '1.0.0',
+    version: `1.0.${build}`,
     orientation: 'portrait',
     icon: './assets/icon.png',
     userInterfaceStyle: 'automatic',
@@ -22,11 +24,11 @@ module.exports = {
       supportsTablet: true,
       requireFullScreen: true,
       bundleIdentifier: 'com.iqbalhossain.hisabkhata',
-      buildNumber: '1',
+      buildNumber: String(build),
     },
     android: {
       package: 'com.iqbalhossain.hisabkhata',
-      versionCode: 1,
+      versionCode: build,
       adaptiveIcon: {
         backgroundColor: '#0A84FF',
         foregroundImage: './assets/android-icon-foreground.png',
