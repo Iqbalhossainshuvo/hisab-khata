@@ -133,7 +133,9 @@ test('ledger: day summary', () => {
   assert.equal(d.txns.length, 8);
   const y = daySummary(db, shiftDay('2026-10-10', -1));
   assert.equal(y.from, '2026-10-09');
-  assert.equal(y.openingCash, 0);
+  // opening cash entered that day counts as the carried-forward balance, not as money in
+  assert.equal(y.openingCash, 500000);
+  assert.equal(y.cashIn, 0);
   assert.equal(y.closingCash, 500000);
 });
 
@@ -167,7 +169,7 @@ test('ledger: month range and summary', () => {
   assert.deepEqual(monthRange('2028-02-03'), ['2028-02-01', '2028-02-29']);
   const db = book();
   const m = rangeSummary(db, ...monthRange('2026-10-10'));
-  assert.equal(m.openingCash, 0);
+  assert.equal(m.openingCash, 500000);
   assert.equal(m.closingCash, balances(db).cash);
   assert.equal(m.txns.length, 11);
   assert.equal(m.txns[0].date, '2026-10-10');

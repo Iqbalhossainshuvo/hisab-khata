@@ -112,7 +112,11 @@ export default function Parties() {
           />
         }
       />
-      <Fab icon="person-add" onPress={() => router.push({ pathname: '/party/edit', params: { kind } })} />
+      <Fab
+        icon="person-add"
+        label="নতুন নাম যোগ করুন"
+        onPress={() => router.push({ pathname: '/party/edit', params: { kind } })}
+      />
     </Page>
   );
 }

@@ -192,7 +192,9 @@ export function rangeSummary(db: Db, from: string, to: string): DaySummary {
     if (t.deleted || t.date < from || t.date > to) continue;
     s.txns.push(t);
     const e = txnEffects(t);
-    if (e.cash > 0) s.cashIn += e.cash;
+    // an opening cash balance is the carried-forward amount, not money that came in that day
+    if (t.type === 'opening') s.openingCash += e.cash;
+    else if (e.cash > 0) s.cashIn += e.cash;
     else s.cashOut -= e.cash;
     s.fees += e.fee;
     s.expenses += e.expense;
@@ -209,7 +211,7 @@ export function rangeSummary(db: Db, from: string, to: string): DaySummary {
       s.agentPaid += t.amount;
     }
   }
-  s.closingCash = opening + s.cashIn - s.cashOut;
+  s.closingCash = s.openingCash + s.cashIn - s.cashOut;
   s.txns.sort((a, b) => (a.date === b.date ? b.createdAt - a.createdAt : a.date < b.date ? 1 : -1));
   return s;
 }

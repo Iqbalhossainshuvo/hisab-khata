@@ -597,7 +597,15 @@ export function SearchBar({
   );
 }
 
-export function Fab({ onPress, icon = 'add' }: { onPress: () => void; icon?: IconName }) {
+export function Fab({
+  onPress,
+  icon = 'add',
+  label = 'নতুন যোগ করুন',
+}: {
+  onPress: () => void;
+  icon?: IconName;
+  label?: string;
+}) {
   const t = useTheme();
   const insets = useSafeAreaInsets();
   const { width } = useLayout();
@@ -605,6 +613,8 @@ export function Fab({ onPress, icon = 'add' }: { onPress: () => void; icon?: Ico
   const right = Math.max(20, (width - MAX_W) / 2 + 20);
   return (
     <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={label}
       onPress={() => {
         tap();
         onPress();

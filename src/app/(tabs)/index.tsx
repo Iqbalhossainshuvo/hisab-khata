@@ -67,7 +67,7 @@ export default function Home() {
             color={dark ? t.orange : t.indigo}
             onPress={() => setPrefs({ theme: dark ? 'light' : 'dark' })}
           />
-          <Pressable onPress={() => router.push('/profile')} hitSlop={6}>
+          <Pressable accessibilityLabel="প্রোফাইল" onPress={() => router.push('/profile')} hitSlop={6}>
             <Avatar name={name} photo={session?.user?.photo} size={38} />
           </Pressable>
         </>

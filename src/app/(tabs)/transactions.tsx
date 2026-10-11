@@ -96,7 +96,7 @@ export default function Transactions() {
           />
         }
       />
-      <Fab onPress={() => router.push({ pathname: '/txn/new', params: { type: 'send' } })} />
+      <Fab label="নতুন লেনদেন" onPress={() => router.push({ pathname: '/txn/new', params: { type: 'send' } })} />
     </Page>
   );
 }
